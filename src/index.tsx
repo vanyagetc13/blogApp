@@ -7,7 +7,15 @@ import store from './store'
 import App from './App'
 import './index.scss'
 import ArticlesPage from './pages/ArticlesPage/ArticlesPage'
-import Page404 from './pages/404page/Page404'
+import Page404 from './pages/Page404/Page404'
+import ArticleSlugPage from './pages/ArticleSlugPage/ArticleSlugPage'
+import SignUpPage from './pages/SignUpPage/SignUpPage'
+import SignInPage from './pages/SignInPage/SignInPage'
+import ProfilePage from './pages/ProfilePage/ProfilePage'
+import ProfileEditPage from './pages/ProfileEditPage/ProfileEditPage'
+import ProfileMePage from './pages/ProfileMePage/ProfileMePage'
+import NewArticlePage from './pages/NewArticlePage/NewArticlePage'
+import ArticleEditPage from './pages/ArticleEditPage/ArticleEditPage'
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement)
 
@@ -24,6 +32,35 @@ const router = createBrowserRouter([
 			{
 				path: '/articles',
 				element: <ArticlesPage />,
+			},
+			{
+				path: '/articles/:slug',
+				element: <ArticleSlugPage />,
+			},
+			{
+				path: '/articles/:slug/edit',
+				element: <ArticleEditPage />,
+			},
+			{
+				path: '/sign-up',
+				element: <SignUpPage />,
+			},
+			{
+				path: '/sign-in',
+				element: <SignInPage />,
+			},
+			{ path: '/profiles', element: <ProfileMePage /> },
+			{
+				path: '/profiles/:username',
+				element: <ProfilePage />,
+			},
+			{
+				path: '/profiles/:username/edit',
+				element: <ProfileEditPage />,
+			},
+			{
+				path: '/new-article',
+				element: <NewArticlePage />,
 			},
 		],
 	},

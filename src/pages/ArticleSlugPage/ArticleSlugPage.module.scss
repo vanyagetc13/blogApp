@@ -1,0 +1,32 @@
+.page {
+	margin: 25px;
+	padding: 20px;
+	width: 65%;
+	align-self: center;
+	background-color: #fff;
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	box-shadow: 0px 4px 12px 0px rgba(0, 0, 0, 0.15);
+}
+
+.header {
+	display: flex;
+	gap: 20px;
+	justify-content: space-between;
+}
+
+.description {
+	font-size: 0.75em;
+	color: #00000080;
+}
+
+.btnBox {
+	display: flex;
+	gap: 12px;
+	flex-wrap: nowrap;
+}
+
+.body {
+	padding-right: 20px;
+}

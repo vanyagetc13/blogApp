@@ -1,20 +1,22 @@
-import { imgURL } from '..'
+import { imgURL } from '.'
+
+type DateString = string
 
 interface IArticle {
 	slug: string
 	title: string
 	description: string
 	body: string
-	tags: string[]
-	createdAt: Date
+	tagList: string[]
+	createdAt: DateString
 	updatedAt: Date
-	favorited: false
+	favorited: boolean
 	favoritesCount: number
 	author: {
 		username: string
 		bio: string
 		image: imgURL
-		following: false
+		following: boolean
 	}
 }
 

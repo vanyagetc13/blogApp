@@ -1,0 +1,30 @@
+.header {
+	font-size: 1.25rem;
+	display: flex;
+	justify-content: space-between;
+}
+
+.articleInfo {
+	display: flex;
+	flex-direction: column;
+	gap: 5px;
+}
+
+.link {
+	display: block;
+	max-width: 420px;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	white-space: nowrap;
+	text-decoration: none;
+	color: #1890ff;
+}
+
+.title__wrapper {
+	display: flex;
+	gap: 12px;
+}
+
+.title {
+	font-size: 1em;
+}

@@ -6,7 +6,9 @@
 	background-color: #fff;
 }
 
-.title {
+.title > a {
 	font-size: 1.125rem;
 	font-weight: 400;
+	color: black;
+	text-decoration: none;
 }

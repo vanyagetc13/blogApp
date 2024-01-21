@@ -33,7 +33,7 @@
 				"SwitchCase": 1
 			}
 		],
-		"no-unused-vars": "warn",
+		"no-unused-vars": "off", // @ts добавляет своё правило
 		"prettier/prettier": "error",
 		"linebreak-style": [0, "unix"],
 		"quotes": ["error", "single"],

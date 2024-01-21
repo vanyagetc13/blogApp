@@ -1,0 +1,27 @@
+.wrapper {
+	display: flex;
+	align-items: center;
+	gap: 5px;
+	font-size: 1rem;
+	padding-top: 1px;
+}
+
+.btn {
+	cursor: pointer;
+	width: fit-content !important;
+	height: fit-content !important;
+	padding: 0;
+	&:hover .heart {
+		transform: scale(1.2);
+	}
+}
+
+.heart {
+	color: #ff0707;
+	font-size: 0.75em;
+}
+
+.likes {
+	font-size: 0.75em;
+	margin-top: -2px;
+}

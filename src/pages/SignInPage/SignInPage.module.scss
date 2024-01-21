@@ -1,0 +1,40 @@
+.page {
+	margin-top: 60px;
+	padding: 48px 32px;
+	background-color: #fff;
+	width: fit-content;
+	display: flex;
+	flex-direction: column;
+	align-self: center;
+}
+
+.form {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.title {
+	color: #262626;
+	font-weight: 500;
+	margin-bottom: 12px;
+	text-align: center;
+}
+
+.extra {
+	color: #8c8c8c;
+	text-align: center;
+	padding-top: 8px;
+	& > a {
+		text-decoration: none;
+		color: #1890ff;
+		&:hover {
+			color: #1282eb;
+		}
+	}
+}
+
+.error {
+	color: #e24;
+	font-size: 0.825em;
+}

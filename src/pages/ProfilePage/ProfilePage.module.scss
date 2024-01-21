@@ -1,0 +1,26 @@
+.page {
+	background-color: #fff;
+	width: fit-content;
+	padding: 30px 20px;
+	align-self: center;
+	margin-top: 60px;
+	display: flex;
+	gap: 10px;
+}
+
+.info {
+	display: flex;
+	gap: 10px;
+	flex-direction: column;
+}
+
+.side {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	padding: 0 px;
+}
+
+.bio {
+	font-size: 1.2em;
+}

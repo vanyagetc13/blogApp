@@ -1,15 +1,17 @@
-import React, { useState } from 'react'
+import React from 'react'
+import { useSelector } from 'react-redux'
+import { Link } from 'react-router-dom'
 import { ConfigProvider } from 'antd'
-import styles from './AppHeader.module.scss'
+import { RootState } from '../../store'
 import AuthorizedHeadSide from './AuthorizedHeadSide/AuthorizedHeadSide'
+import styles from './AppHeader.module.scss'
 
 const AppHeader = () => {
-	const [authorized, setAuthorized] = useState<boolean>(true)
+	const auth = useSelector((state: RootState) => state.auth)
 	return (
 		<ConfigProvider
 			theme={{
 				token: {
-					colorPrimary: '#1890FF',
 					colorPrimaryHover: 'green',
 				},
 				components: {
@@ -22,9 +24,11 @@ const AppHeader = () => {
 		>
 			<header className={styles.header}>
 				<div className={styles.title__wrapper}>
-					<h1 className={styles.title}>RealWorld Blog</h1>
+					<h1 className={styles.title}>
+						<Link to={'/'}>RealWorld Blog</Link>
+					</h1>
 				</div>
-				<AuthorizedHeadSide auth={authorized} />
+				<AuthorizedHeadSide user={auth.currentUser} />
 			</header>
 		</ConfigProvider>
 	)
