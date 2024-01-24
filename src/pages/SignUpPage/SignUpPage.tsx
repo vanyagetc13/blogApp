@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import { useForm, SubmitHandler } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
-import { Button, Checkbox } from 'antd'
+import { Button, Checkbox, notification } from 'antd'
 import { useAppDispatch } from '../../hooks'
 import PageWrapper from '../PageWrapper'
 import ErrorSpan from '../../components/ErrorSpan/ErrorSpan'
@@ -30,9 +30,10 @@ const required = {
 const SignUpPage = () => {
 	const dispatch = useAppDispatch()
 	const nav = useNavigate()
+	const [api, context] = notification.useNotification()
 	const {
 		currentUser: user,
-		errors,
+		error,
 		loading,
 	} = useSelector((state: RootState) => state.auth)
 	const { register, handleSubmit, setValue, setError, formState } =
@@ -84,18 +85,22 @@ const SignUpPage = () => {
 		register('agreement', { required })
 	}, [])
 	useEffect(() => {
-		if (errors) {
-			for (const input in errors) {
-				console.log(input)
-			}
-		}
 		if (user && user.token) {
 			localStorage.setItem('token', JSON.stringify(user.token))
 			nav('/articles')
 		}
-	}, [user, errors])
+	}, [user])
+	useEffect(() => {
+		if (error)
+			api.error({
+				message: error,
+				placement: 'bottomRight',
+				duration: 7,
+			})
+	}, [error])
 	return (
 		<PageWrapper className={styles.page}>
+			{context}
 			<form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
 				<h3 className={styles.title}>Create new account</h3>
 				<LabeledInput

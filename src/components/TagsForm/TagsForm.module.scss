@@ -1,0 +1,16 @@
+.wrapper {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.inputWrapper {
+	display: flex;
+	gap: 20px;
+	width: 65%;
+}
+
+.input {
+	display: flex;
+	width: 66%;
+}

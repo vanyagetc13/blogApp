@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import { Outlet } from 'react-router-dom'
 import AppHeader from './components/AppHeader/AppHeader'
 import { useAppDispatch } from './hooks'
-import { getCurrentUser } from './store/authSlice'
+import { getCurrentUser, logOut } from './store/authSlice'
 
 function App() {
 	const dispatch = useAppDispatch()
@@ -11,6 +11,7 @@ function App() {
 			| string
 			| null
 		if (token) dispatch(getCurrentUser({ token }))
+		else dispatch(logOut())
 	}, [])
 	return (
 		<>

@@ -4,16 +4,18 @@ import { useNavigate } from 'react-router-dom'
 import { SubmitHandler, ValidationRule, useForm } from 'react-hook-form'
 import { Button } from 'antd'
 import LabeledInput from '../LabeledInput/LabeledInput'
+import TagsForm from '../TagsForm/TagsForm'
 import { useAppDispatch } from '../../hooks'
 import { RootState } from '../../store'
 import { createArticle, editArticle } from '../../store/articleSlice'
+import { tag } from '../../types'
 import styles from './ArticleForm.module.scss'
 
 export type IArticleForm = {
-	tags?: string[]
-	title?: string
-	description?: string
-	body?: string
+	tagList?: string[]
+	title: string
+	description: string
+	body: string
 }
 
 type Props = {
@@ -39,7 +41,6 @@ const ArticleForm = ({ values, formTitle, type, slug }: Props) => {
 	const { register, handleSubmit, formState, setValue } =
 		useForm<IArticleForm>({
 			defaultValues: values,
-			values,
 		})
 	useEffect(() => {
 		register('title', {
@@ -51,26 +52,63 @@ const ArticleForm = ({ values, formTitle, type, slug }: Props) => {
 		register('body', {
 			required,
 		})
-		register('tags')
+		if (type === 'create') register('tagList')
 	}, [])
-	const [asked, setAsked] = useState<boolean>(false)
+
 	useEffect(() => {
-		if (!error && !loading && asked) nav('/')
-	}, [loading, error, asked])
+		if (!error && !loading && formState.isSubmitSuccessful) nav('/')
+	}, [loading, error, formState.isSubmitSuccessful])
+
 	const onSubmit: SubmitHandler<IArticleForm> = (data) => {
 		if (type === 'create') dispatch(createArticle({ article: data, token }))
-		console.log('here', slug)
 		if (type === 'edit' && slug && token)
 			dispatch(editArticle({ article: data, slug, token }))
-		setAsked(true)
 	}
 	const [title, setTitle] = useState<string>(values?.title || '')
 	const [description, setDescription] = useState<string>(
 		values?.description || ''
 	)
 	const [body, setBody] = useState<string>(values?.body || '')
-	const [tags, setTags] = useState<string[]>(values?.tags || [])
-	// Доделать теги TODO
+	const [tags, setTags] = useState<tag[]>(
+		values?.tagList
+			? values.tagList.map((tag) => ({ value: tag, id: tag }))
+			: [{ value: '', id: '0' }]
+	)
+
+	useEffect(() => {
+		if (type === 'create')
+			setValue(
+				'tagList',
+				tags.map((tag) => tag.value)
+			)
+	}, [tags])
+
+	const addNewTag = () => {
+		setTags((prev) => {
+			const newTags = [...prev]
+			newTags.push({
+				value: '',
+				id: Number(new Date()).toString(),
+			})
+			return newTags
+		})
+	}
+	const deleteTag = (id: string) => {
+		setTags((prev) => {
+			const idx = prev.findIndex((tag) => tag.id === id)
+			const newTags = [...prev]
+			newTags.splice(idx, 1)
+			return newTags
+		})
+	}
+	const tagChange = (id: string, value: string) => {
+		setTags((prev) => {
+			const idx = prev.findIndex((tag) => tag.id === id)
+			const newTags = [...prev]
+			newTags[idx].value = value
+			return newTags
+		})
+	}
 	return (
 		<form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
 			<h2 className={styles.title}>{formTitle}</h2>
@@ -106,6 +144,14 @@ const ArticleForm = ({ values, formTitle, type, slug }: Props) => {
 					setValue('body', value)
 				}}
 			/>
+			{type === 'create' && (
+				<TagsForm
+					tagList={tags}
+					tagChange={tagChange}
+					addNewTag={addNewTag}
+					deleteTag={deleteTag}
+				/>
+			)}
 			<Button
 				type="primary"
 				className={styles.submit}

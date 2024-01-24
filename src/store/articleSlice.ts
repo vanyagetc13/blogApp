@@ -18,7 +18,7 @@ interface IInitialState {
 }
 
 const initialState: IInitialState = {
-	loading: true,
+	loading: false,
 	error: '',
 	articles: [],
 	articlesCount: 0,
@@ -46,14 +46,21 @@ const getArticles = createAsyncThunk(
 )
 
 interface getArticleBySlugPayload {
-	slug: IArticle['slug']
+	slug: string
+	token?: string
 }
 
 const getArticleBySlug = createAsyncThunk(
 	'article/getBySlug',
-	async (payload: getArticleBySlugPayload): Promise<IArticle> => {
-		const article = await apiService.getArticleBySlug(payload.slug)
-		return article as IArticle
+	async (
+		payload: getArticleBySlugPayload
+	): Promise<{ article: IArticle | null; error: string }> => {
+		const res = await apiService.getArticleBySlug(
+			payload.slug,
+			payload.token
+		)
+		if ('article' in res) return { article: res.article, error: '' }
+		return { article: null, error: 'Not found' }
 	}
 )
 
@@ -67,7 +74,7 @@ const createArticle = createAsyncThunk(
 		token: IUser['token']
 	}) => {
 		const res = await apiService.createArticle(article, token)
-		console.log(res)
+		return res
 	}
 )
 const editArticle = createAsyncThunk(
@@ -82,48 +89,101 @@ const editArticle = createAsyncThunk(
 		token: string
 	}) => {
 		const res = await apiService.editArticle(article, slug, token)
-		console.log(res)
+		return res
+	}
+)
+
+const deleteArticle = createAsyncThunk(
+	'article/delete',
+	async ({ slug, token }: { slug: string; token: string }) => {
+		const ok = await apiService.deleteArticle(slug, token)
+		return ok
 	}
 )
 
 const articleSlice = createSlice({
 	name: 'article',
 	initialState,
-	reducers: {},
+	reducers: {
+		toggleLike: (state, action) => {
+			const idx = state.articles.findIndex(
+				(article) => article.slug === action.payload
+			)
+			const newArticles = [...state.articles]
+			const count = newArticles[idx].favoritesCount
+			const article = {
+				...newArticles[idx],
+				favorited: !newArticles[idx].favorited,
+				favoritesCount: newArticles[idx].favorited
+					? count - 1
+					: count + 1,
+			}
+			newArticles.splice(idx, 1, article)
+			if (state.articles) state.articles = newArticles
+			if (state.articleBySlug.article)
+				state.articleBySlug.article = {
+					...state.articleBySlug.article,
+					favorited: !state.articleBySlug.article.favorited,
+					favoritesCount: state.articleBySlug.article.favorited
+						? state.articleBySlug.article.favoritesCount - 1
+						: state.articleBySlug.article.favoritesCount + 1,
+				}
+		},
+	},
 	extraReducers: (builder) => {
 		// get Articles
 		builder.addCase(getArticles.pending, (store) => {
 			store.loading = true
+			store.error = ''
 		})
-		builder.addCase(getArticles.fulfilled, (store, action) => {
-			store.articles = action.payload.articles
-			store.articlesCount = action.payload.articlesCount
-			store.loading = false
+		builder.addCase(getArticles.fulfilled, (state, action) => {
+			state.articles = action.payload.articles
+			state.articlesCount = action.payload.articlesCount
+			state.loading = false
 		})
 		// by slug article
-		builder.addCase(getArticleBySlug.pending, (store) => {
-			store.articleBySlug.loading = true
+		builder.addCase(getArticleBySlug.pending, (state) => {
+			state.articleBySlug.loading = true
+			state.error = ''
 		})
-		builder.addCase(getArticleBySlug.fulfilled, (store, action) => {
-			store.articleBySlug.article = action.payload
-			store.articleBySlug.loading = false
+		builder.addCase(getArticleBySlug.fulfilled, (state, action) => {
+			state.articleBySlug.article = action.payload.article
+			state.error = action.payload.error
+			state.articleBySlug.loading = false
 		})
 		// create article
-		builder.addCase(createArticle.pending, (store) => {
-			store.loading = true
+		builder.addCase(createArticle.pending, (state) => {
+			state.loading = true
+			state.error = ''
 		})
-		builder.addCase(createArticle.fulfilled, (store) => {
-			store.loading = false
+		builder.addCase(createArticle.fulfilled, (state) => {
+			state.loading = false
 		})
 		// edit article
 		builder.addCase(editArticle.pending, (state) => {
 			state.loading = true
+			state.error = ''
 		})
 		builder.addCase(editArticle.fulfilled, (state) => {
 			state.loading = false
 		})
+		// delete article
+		builder.addCase(deleteArticle.pending, (state) => {
+			state.loading = true
+		})
+		builder.addCase(deleteArticle.fulfilled, (state, action) => {
+			state.loading = false
+			if (!action.payload) state.error = 'Did not delete the article'
+		})
 	},
 })
 
-export { getArticles, getArticleBySlug, createArticle, editArticle }
+export {
+	getArticles,
+	getArticleBySlug,
+	createArticle,
+	editArticle,
+	deleteArticle,
+}
+export const { toggleLike } = articleSlice.actions
 export default articleSlice.reducer

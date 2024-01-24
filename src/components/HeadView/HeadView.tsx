@@ -36,7 +36,11 @@ const HeadView = ({
 							{title.trim()}
 						</Link>
 					</h3>
-					<LikesView likes={favoritesCount} favorited={favorited} />
+					<LikesView
+						likes={favoritesCount}
+						favorited={favorited}
+						slug={slug}
+					/>
 				</div>
 				{tagList.length ? (
 					<TagsView tagList={tagList} />

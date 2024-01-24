@@ -17,20 +17,14 @@ const ArticlesPage = () => {
 	const token = useSelector(
 		(state: RootState) => state.auth.currentUser?.token
 	)
+	const loadUser = useSelector((state: RootState) => state.auth.loading)
 	const dispatch = useDispatch<AppDispatch>()
-
-	useEffect(() => {
-		dispatch(getArticles({ token }))
-	}, [])
-	useEffect(() => {
-		dispatch(getArticles({ token }))
-	}, [token])
 
 	useEffect(() => {
 		const offset = (page - 1) * PAGE_SIZE
 		const payload = { limit: PAGE_SIZE, offset, token }
-		dispatch(getArticles(payload))
-	}, [page, token])
+		if (!loadUser) dispatch(getArticles(payload))
+	}, [page, token, loadUser])
 
 	return (
 		<PageWrapper className={styles.page}>

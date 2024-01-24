@@ -1,7 +1,7 @@
 /* eslint-disable indent */
 import { IArticleForm } from '../components/ArticleForm/ArticleForm'
 import { ILoginForm } from '../pages/SignInPage/SignInPage'
-import { IUser, IRegisterForm } from '../types'
+import { IUser } from '../types'
 import IArticle from '../types/article'
 import IProfile from '../types/profile'
 
@@ -40,13 +40,19 @@ class ApiService {
 	}
 
 	async getArticleBySlug(
-		slug: IArticle['slug']
-	): Promise<IArticle | unknown> {
+		slug: IArticle['slug'],
+		token?: string
+	): Promise<{ article: IArticle } | { error: unknown }> {
 		try {
-			const response = await fetch(`${this.baseURL}/articles/${slug}`)
-			const json = (await response.json()) as { article: IArticle }
-			const { article } = json
-			return article
+			const response = await fetch(`${this.baseURL}/articles/${slug}`, {
+				headers: token
+					? {
+							Authorization: `Token ${token}`,
+						}
+					: undefined,
+			})
+			const { article } = (await response.json()) as { article: IArticle }
+			return { article }
 		} catch (error) {
 			return { error }
 		}
@@ -68,21 +74,30 @@ class ApiService {
 
 	async registerUser(
 		user: Pick<IUser, 'username' | 'email' | 'password'>
-	): Promise<{ user?: IUser; errors?: Partial<IRegisterForm> }> {
+	): Promise<{ user?: IUser; error?: string }> {
 		const response = await fetch(`${this.baseURL}/users`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ user }),
 		})
-		const json = (await response.json()) as
-			| { user: IUser }
-			| { errors: Partial<IRegisterForm> }
-		return json
+		if (response.ok) {
+			const { user } = (await response.json()) as { user: IUser }
+			return { user }
+		}
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		const { errors } = (await response.json()) as {
+			errors: {
+				[key: string]: string
+			}
+		}
+		if ('email' in errors) return { error: 'Email is already taken.' }
+		if ('username' in errors) return { error: 'Username is already taken.' }
+		return { error: 'Unexpected error.' }
 	}
 
 	async loginUser(
 		user: Pick<Required<IUser>, 'email' | 'password'>
-	): Promise<{ user?: IUser; errors?: Partial<ILoginForm> }> {
+	): Promise<{ user?: IUser; error?: string }> {
 		const response = await fetch(`${this.baseURL}/users/login`, {
 			method: 'POST',
 			headers: {
@@ -95,7 +110,7 @@ class ApiService {
 			return json
 		}
 		const json = (await response.json()) as { errors: Partial<ILoginForm> }
-		return json
+		return { error: '' }
 	}
 
 	async getProfile(username: IUser['username']): Promise<IProfile> {
@@ -118,7 +133,9 @@ class ApiService {
 			},
 			body: JSON.stringify({ article }),
 		})
-		const { Article } = (await response.json()) as { Article: IArticle }
+		const { article: Article } = (await response.json()) as {
+			article: IArticle
+		}
 		return Article
 	}
 	async editArticle(
@@ -134,9 +151,40 @@ class ApiService {
 			},
 			body: JSON.stringify({ article }),
 		})
-		console.log(response)
 		const { Article } = (await response.json()) as { Article: IArticle }
 		return Article
+	}
+	async deleteArticle(slug: string, token: string): Promise<boolean> {
+		const response = await fetch(`${this.baseURL}/articles/${slug}`, {
+			method: 'DELETE',
+			headers: {
+				Authorization: `Token ${token}`,
+			},
+		})
+		return response.ok
+	}
+
+	async articleLike(
+		slug: string,
+		token: string,
+		method: 'POST' | 'DELETE'
+	): Promise<{ article?: IArticle; error?: string }> {
+		const response = await fetch(
+			`${this.baseURL}/articles/${slug}/favorite`,
+			{
+				method,
+				headers: {
+					Authorization: `Token ${token}`,
+				},
+			}
+		)
+		if (response.ok) {
+			const { article } = (await response.json()) as { article: IArticle }
+			return { article }
+		}
+		if (response.status === 401)
+			return { error: 'You are not authorized. Try to relog.' }
+		else return { error: 'Unexpected error.' }
 	}
 }
 

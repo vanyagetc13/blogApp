@@ -8,7 +8,6 @@ const ProfileMePage = () => {
 	const { currentUser, loading } = useSelector(
 		(state: RootState) => state.auth
 	)
-	console.log(currentUser?.username)
 	useEffect(() => {
 		if (currentUser?.username && !loading)
 			nav(`/profiles/${currentUser.username}`)

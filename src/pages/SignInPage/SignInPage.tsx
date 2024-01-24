@@ -28,7 +28,7 @@ const SignInPage = () => {
 	const dispatch = useAppDispatch()
 	const {
 		currentUser: user,
-		errors,
+		error,
 		loading,
 	} = useSelector((state: RootState) => state.auth)
 	const onSubmit: SubmitHandler<ILoginForm> = (data) => {
@@ -80,11 +80,7 @@ const SignInPage = () => {
 				<Button type="primary" htmlType="submit" loading={loading}>
 					Login
 				</Button>
-				{errors && (
-					<div className={styles.error}>
-						Email or password is incorrect.
-					</div>
-				)}
+				{error && <div className={styles.error}>{error}</div>}
 			</form>
 			<div className={styles.extra}>
 				Don’t have an account? <Link to={'/sign-up'}>Sign Up</Link>.

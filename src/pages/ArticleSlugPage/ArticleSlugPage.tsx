@@ -1,10 +1,11 @@
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Button, ConfigProvider } from 'antd'
+import { unwrapResult } from '@reduxjs/toolkit'
+import { Button, ConfigProvider, Popconfirm } from 'antd'
 import ReactMarkdown from 'react-markdown'
 import HeadView from '../../components/HeadView/HeadView'
-import { getArticleBySlug } from '../../store/articleSlice'
+import { deleteArticle, getArticleBySlug } from '../../store/articleSlice'
 import { AppDispatch, RootState } from '../../store'
 import PageWrapper from '../PageWrapper'
 import styles from './ArticleSlugPage.module.scss'
@@ -17,12 +18,33 @@ const ArticleSlugPage = () => {
 		(state: RootState) => state.articles.articleBySlug
 	)
 	const auth = useSelector((state: RootState) => state.auth.currentUser)
+	const loadUser = useSelector((state: RootState) => state.auth.loading)
+	const error = useSelector((state: RootState) => state.articles.error)
 	useEffect(() => {
-		if (slug) dispatch(getArticleBySlug({ slug }))
-	}, [slug])
+		if (slug && !loadUser)
+			dispatch(getArticleBySlug({ slug, token: auth?.token }))
+	}, [slug, loadUser])
+	const deleteHandler = () => {
+		if (slug && auth?.token)
+			dispatch(deleteArticle({ slug, token: auth?.token }))
+				.then(unwrapResult)
+				.then((ok) => {
+					if (ok) nav('/')
+				})
+	}
+	useEffect(() => {
+		if (error)
+			setTimeout(() => {
+				nav('/')
+			}, 3000)
+	}, [error])
 	return (
 		<PageWrapper className={styles.page}>
-			{!loading && !article && <div>Error...</div>}
+			{!loading && !article && (
+				<div>
+					Error occured... {error} <br /> You will be redirected.
+				</div>
+			)}
 			{loading && <div>Loading...</div>}
 			{article && (
 				<>
@@ -33,7 +55,16 @@ const ArticleSlugPage = () => {
 						</p>
 						{auth && auth.username === article.author.username && (
 							<div className={styles.btnBox}>
-								<Button danger>Delete</Button>
+								<Popconfirm
+									title="Delete the article"
+									description="Are you sure to delete the article?"
+									okText="Yes"
+									cancelText="No"
+									okButtonProps={{ loading: loading }}
+									onConfirm={deleteHandler}
+								>
+									<Button danger>Delete</Button>
+								</Popconfirm>
 								<ConfigProvider
 									theme={{
 										token: {

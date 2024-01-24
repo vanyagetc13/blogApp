@@ -18,7 +18,7 @@ const ArticleCard = ({ article }: Props) => {
 		tagList,
 		author,
 		createdAt,
-		body,
+		description,
 	} = article
 	return (
 		<li className={styles.card}>
@@ -31,9 +31,9 @@ const ArticleCard = ({ article }: Props) => {
 				author={author}
 				createdAt={createdAt}
 			/>
-			{body ? (
+			{description ? (
 				<ReactMarkdown className={styles.body}>
-					{getSlicedText(body.replaceAll('/n', '\n'), 50)}
+					{getSlicedText(description.replaceAll('/n', '\n'), 50)}
 				</ReactMarkdown>
 			) : (
 				<span className="empty">Nothing here :(</span>

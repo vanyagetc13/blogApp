@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import { IRegisterForm, IUser } from '../types'
+import { IUser } from '../types'
 import apiService from '../services/apiService'
 
 interface LoginFormErrors {
@@ -9,13 +9,13 @@ interface LoginFormErrors {
 interface IInitialState {
 	currentUser: IUser | null
 	loading: boolean
-	errors: Partial<IRegisterForm> | LoginFormErrors | null
+	error: string | null
 }
 
 const initialState: IInitialState = {
 	currentUser: null,
-	loading: false,
-	errors: null,
+	loading: true,
+	error: null,
 }
 
 const getCurrentUser = createAsyncThunk(
@@ -53,7 +53,7 @@ const authSlice = createSlice({
 		logOut: (state) => {
 			state.currentUser = null
 			state.loading = false
-			state.errors = null
+			state.error = null
 		},
 	},
 	extraReducers: (builder) => {
@@ -71,9 +71,10 @@ const authSlice = createSlice({
 		// Register
 		builder.addCase(registerUser.pending, (state) => {
 			state.loading = true
+			state.error = null
 		})
 		builder.addCase(registerUser.fulfilled, (state, action) => {
-			if (action.payload.errors) state.errors = action.payload.errors
+			if (action.payload.error) state.error = action.payload.error
 			if (action.payload.user) state.currentUser = action.payload.user
 			state.loading = false
 		})
@@ -82,7 +83,7 @@ const authSlice = createSlice({
 			state.loading = true
 		})
 		builder.addCase(loginUser.fulfilled, (state, action) => {
-			if (action.payload.errors) state.errors = action.payload.errors
+			if (action.payload.error) state.error = action.payload.error
 			if (action.payload.user) state.currentUser = action.payload.user
 			state.loading = false
 		})
