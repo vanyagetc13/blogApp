@@ -7,8 +7,8 @@ interface IUser {
 	email: email
 	token?: JWTToken
 	username: string
-	bio: string
-	image: imgURL
+	bio?: string
+	image?: imgURL
 	password?: string
 }
 

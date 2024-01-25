@@ -1,5 +1,6 @@
 /* eslint-disable indent */
 import { IArticleForm } from '../components/ArticleForm/ArticleForm'
+import { IProfileForm } from '../components/ProfileForm/ProfileForm'
 import { ILoginForm } from '../pages/SignInPage/SignInPage'
 import { IUser } from '../types'
 import IArticle from '../types/article'
@@ -185,6 +186,23 @@ class ApiService {
 		if (response.status === 401)
 			return { error: 'You are not authorized. Try to relog.' }
 		else return { error: 'Unexpected error.' }
+	}
+
+	async updateUser(
+		user: Partial<IProfileForm>,
+		token: string
+	): Promise<IUser | null> {
+		const response = await fetch(`${this.baseURL}/user`, {
+			method: 'PUT',
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: `Token ${token}`,
+			},
+			body: JSON.stringify({ user }),
+		})
+		const { user: User } = (await response.json()) as { user: IUser }
+		if (response.ok) return User
+		return null
 	}
 }
 

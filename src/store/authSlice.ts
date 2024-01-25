@@ -1,10 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { IUser } from '../types'
 import apiService from '../services/apiService'
-
-interface LoginFormErrors {
-	'email or password'?: string
-}
+import { IProfileForm } from '../components/ProfileForm/ProfileForm'
 
 interface IInitialState {
 	currentUser: IUser | null
@@ -45,6 +42,13 @@ const loginUser = createAsyncThunk(
 		return res
 	}
 )
+const updateUser = createAsyncThunk(
+	'user/update',
+	async ({ user, token }: { user: Partial<IProfileForm>; token: string }) => {
+		const res = await apiService.updateUser(user, token)
+		return res
+	}
+)
 
 const authSlice = createSlice({
 	name: 'auth',
@@ -54,6 +58,9 @@ const authSlice = createSlice({
 			state.currentUser = null
 			state.loading = false
 			state.error = null
+		},
+		clearError: (state) => {
+			state.error = ''
 		},
 	},
 	extraReducers: (builder) => {
@@ -87,9 +94,18 @@ const authSlice = createSlice({
 			if (action.payload.user) state.currentUser = action.payload.user
 			state.loading = false
 		})
+		// update
+		builder.addCase(updateUser.pending, (state) => {
+			state.loading = true
+			state.error = ''
+		})
+		builder.addCase(updateUser.fulfilled, (state, action) => {
+			state.loading = false
+			if (action.payload) state.currentUser = action.payload
+		})
 	},
 })
 
-export const { logOut } = authSlice.actions
-export { getCurrentUser, registerUser, loginUser }
+export const { logOut, clearError } = authSlice.actions
+export { getCurrentUser, registerUser, loginUser, updateUser }
 export default authSlice.reducer

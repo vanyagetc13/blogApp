@@ -17,8 +17,7 @@ const ArticleEditPage = () => {
 	useEffect(() => {
 		if (!articleBySlug.article && slug) dispatch(getArticleBySlug({ slug }))
 	}, [])
-	if (!articleBySlug.article && articleBySlug.loading)
-		return <div>Loading...</div>
+	if (articleBySlug.loading) return <div>Loading...</div>
 	if (!articleBySlug.article) return <div>No article found.</div>
 	const { body, title, description, tagList } = articleBySlug.article
 	return (

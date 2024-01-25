@@ -4,7 +4,7 @@ import { SubmitHandler, useForm } from 'react-hook-form'
 import { useSelector } from 'react-redux'
 import { Button } from 'antd'
 import { RootState } from '../../store'
-import { loginUser } from '../../store/authSlice'
+import { loginUser, clearError } from '../../store/authSlice'
 import PageWrapper from '../PageWrapper'
 import LabeledInput from '../../components/LabeledInput/LabeledInput'
 import { useAppDispatch } from '../../hooks'
@@ -53,6 +53,7 @@ const SignInPage = () => {
 				message: 'Password can not be longer then 40 symbols',
 			},
 		})
+		dispatch(clearError())
 	}, [])
 	useEffect(() => {
 		if (user && user.token) {

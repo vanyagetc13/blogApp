@@ -52,7 +52,7 @@ const ArticleForm = ({ values, formTitle, type, slug }: Props) => {
 		register('body', {
 			required,
 		})
-		if (type === 'create') register('tagList')
+		register('tagList')
 	}, [])
 
 	useEffect(() => {
@@ -76,11 +76,10 @@ const ArticleForm = ({ values, formTitle, type, slug }: Props) => {
 	)
 
 	useEffect(() => {
-		if (type === 'create')
-			setValue(
-				'tagList',
-				tags.map((tag) => tag.value)
-			)
+		setValue(
+			'tagList',
+			tags.map((tag) => tag.value)
+		)
 	}, [tags])
 
 	const addNewTag = () => {
@@ -144,14 +143,12 @@ const ArticleForm = ({ values, formTitle, type, slug }: Props) => {
 					setValue('body', value)
 				}}
 			/>
-			{type === 'create' && (
-				<TagsForm
-					tagList={tags}
-					tagChange={tagChange}
-					addNewTag={addNewTag}
-					deleteTag={deleteTag}
-				/>
-			)}
+			<TagsForm
+				tagList={tags}
+				tagChange={tagChange}
+				addNewTag={addNewTag}
+				deleteTag={deleteTag}
+			/>
 			<Button
 				type="primary"
 				className={styles.submit}

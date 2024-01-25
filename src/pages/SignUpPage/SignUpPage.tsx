@@ -7,7 +7,7 @@ import { useAppDispatch } from '../../hooks'
 import PageWrapper from '../PageWrapper'
 import ErrorSpan from '../../components/ErrorSpan/ErrorSpan'
 import LabeledInput from '../../components/LabeledInput/LabeledInput'
-import { registerUser } from '../../store/authSlice'
+import { registerUser, clearError } from '../../store/authSlice'
 import { IRegisterForm } from '../../types'
 import { RootState } from '../../store'
 import styles from './SignUpPage.module.scss'
@@ -83,6 +83,7 @@ const SignUpPage = () => {
 		})
 		register('passwordRepeated', { required })
 		register('agreement', { required })
+		dispatch(clearError())
 	}, [])
 	useEffect(() => {
 		if (user && user.token) {
