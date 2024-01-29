@@ -1,18 +1,20 @@
 import React, { useEffect, useState } from 'react'
+import { nanoid } from 'nanoid'
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import { SubmitHandler, ValidationRule, useForm } from 'react-hook-form'
-import { Button } from 'antd'
+import { SubmitHandler, useForm } from 'react-hook-form'
+import { Button, message } from 'antd'
 import LabeledInput from '../LabeledInput/LabeledInput'
 import TagsForm from '../TagsForm/TagsForm'
 import { useAppDispatch } from '../../hooks'
+import { constants } from '../../utils'
 import { RootState } from '../../store'
 import { createArticle, editArticle } from '../../store/articleSlice'
 import { tag } from '../../types'
 import styles from './ArticleForm.module.scss'
 
 export type IArticleForm = {
-	tagList?: string[]
+	tagList: string[]
 	title: string
 	description: string
 	body: string
@@ -25,14 +27,10 @@ type Props = {
 	slug?: string
 }
 
-const required: ValidationRule<boolean> = {
-	value: true,
-	message: 'This field is required.',
-}
-
 const ArticleForm = ({ values, formTitle, type, slug }: Props) => {
 	const dispatch = useAppDispatch()
 	const nav = useNavigate()
+	const [api, context] = message.useMessage()
 	const loading = useSelector((state: RootState) => state.articles.loading)
 	const error = useSelector((state: RootState) => state.articles.error)
 	const token = useSelector(
@@ -44,22 +42,32 @@ const ArticleForm = ({ values, formTitle, type, slug }: Props) => {
 		})
 	useEffect(() => {
 		register('title', {
-			required,
+			required: constants.required,
 		})
 		register('description', {
-			required,
+			required: constants.required,
 		})
 		register('body', {
-			required,
+			required: constants.required,
 		})
 		register('tagList')
 	}, [])
 
 	useEffect(() => {
-		if (!error && !loading && formState.isSubmitSuccessful) nav('/')
+		if (!error && !loading && formState.isSubmitSuccessful && slug)
+			nav(`/articles/${slug}`)
+		if (!error && !loading && formState.isSubmitSuccessful && !slug) {
+			nav('/')
+		}
+		if (error)
+			api.error({
+				content: error,
+				duration: 7,
+			})
 	}, [loading, error, formState.isSubmitSuccessful])
 
 	const onSubmit: SubmitHandler<IArticleForm> = (data) => {
+		data.tagList = data.tagList.filter((tag) => tag.trim() !== '')
 		if (type === 'create') dispatch(createArticle({ article: data, token }))
 		if (type === 'edit' && slug && token)
 			dispatch(editArticle({ article: data, slug, token }))
@@ -71,7 +79,10 @@ const ArticleForm = ({ values, formTitle, type, slug }: Props) => {
 	const [body, setBody] = useState<string>(values?.body || '')
 	const [tags, setTags] = useState<tag[]>(
 		values?.tagList
-			? values.tagList.map((tag) => ({ value: tag, id: tag }))
+			? values.tagList.map((tag) => ({
+					value: tag,
+					id: nanoid(),
+				}))
 			: [{ value: '', id: '0' }]
 	)
 
@@ -87,7 +98,7 @@ const ArticleForm = ({ values, formTitle, type, slug }: Props) => {
 			const newTags = [...prev]
 			newTags.push({
 				value: '',
-				id: Number(new Date()).toString(),
+				id: nanoid(),
 			})
 			return newTags
 		})
@@ -110,6 +121,7 @@ const ArticleForm = ({ values, formTitle, type, slug }: Props) => {
 	}
 	return (
 		<form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
+			{context}
 			<h2 className={styles.title}>{formTitle}</h2>
 			<LabeledInput
 				title="Title"

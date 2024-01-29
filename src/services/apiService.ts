@@ -1,7 +1,6 @@
 /* eslint-disable indent */
 import { IArticleForm } from '../components/ArticleForm/ArticleForm'
 import { IProfileForm } from '../components/ProfileForm/ProfileForm'
-import { ILoginForm } from '../pages/SignInPage/SignInPage'
 import { IUser } from '../types'
 import IArticle from '../types/article'
 import IProfile from '../types/profile'
@@ -110,7 +109,14 @@ class ApiService {
 			const json = (await response.json()) as { user: IUser }
 			return json
 		}
-		const json = (await response.json()) as { errors: Partial<ILoginForm> }
+		const { errors } = (await response.json()) as {
+			errors: {
+				[key: string]: string
+			}
+		}
+		if ('email or password' in errors) {
+			return { error: 'Email or password is invalid' }
+		}
 		return { error: '' }
 	}
 
@@ -143,7 +149,7 @@ class ApiService {
 		article: IArticleForm,
 		slug: string,
 		token: string
-	): Promise<IArticle> {
+	): Promise<{ article?: IArticle; error?: string }> {
 		const response = await fetch(`${this.baseURL}/articles/${slug}`, {
 			method: 'PUT',
 			headers: {
@@ -152,8 +158,11 @@ class ApiService {
 			},
 			body: JSON.stringify({ article }),
 		})
-		const { Article } = (await response.json()) as { Article: IArticle }
-		return Article
+		if (response.ok) {
+			const { Article } = (await response.json()) as { Article: IArticle }
+			return { article: Article }
+		}
+		return { error: 'unexpected error' }
 	}
 	async deleteArticle(slug: string, token: string): Promise<boolean> {
 		const response = await fetch(`${this.baseURL}/articles/${slug}`, {

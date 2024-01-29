@@ -164,7 +164,8 @@ const articleSlice = createSlice({
 			state.loading = true
 			state.error = ''
 		})
-		builder.addCase(editArticle.fulfilled, (state) => {
+		builder.addCase(editArticle.fulfilled, (state, action) => {
+			if (action.payload.error) state.error = action.payload.error
 			state.loading = false
 		})
 		// delete article

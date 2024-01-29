@@ -4,6 +4,7 @@ import { useForm, SubmitHandler } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
 import { Button, Checkbox, notification } from 'antd'
 import { useAppDispatch } from '../../hooks'
+import { constants } from '../../utils'
 import PageWrapper from '../PageWrapper'
 import ErrorSpan from '../../components/ErrorSpan/ErrorSpan'
 import LabeledInput from '../../components/LabeledInput/LabeledInput'
@@ -12,19 +13,12 @@ import { IRegisterForm } from '../../types'
 import { RootState } from '../../store'
 import styles from './SignUpPage.module.scss'
 
-const emailRegex = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/
-
 const defaultValues: IRegisterForm = {
 	email: '',
 	username: '',
 	password: '',
 	passwordRepeated: '',
 	agreement: false,
-}
-
-const required = {
-	value: true,
-	message: 'This field is required',
 }
 
 const SignUpPage = () => {
@@ -53,7 +47,7 @@ const SignUpPage = () => {
 	}
 	useEffect(() => {
 		register('username', {
-			required,
+			required: constants.required,
 			minLength: {
 				value: 3,
 				message: 'Username must be at least 3 symbols long',
@@ -64,14 +58,14 @@ const SignUpPage = () => {
 			},
 		})
 		register('email', {
-			required,
+			required: constants.required,
 			pattern: {
-				value: emailRegex,
+				value: constants.emailRegex,
 				message: 'You need to enter valid email',
 			},
 		})
 		register('password', {
-			required,
+			required: constants.required,
 			minLength: {
 				value: 6,
 				message: 'Password must be at least 6 symbols long',
@@ -81,8 +75,8 @@ const SignUpPage = () => {
 				message: 'Password can not be longer then 40 symbols',
 			},
 		})
-		register('passwordRepeated', { required })
-		register('agreement', { required })
+		register('passwordRepeated', { required: constants.required })
+		register('agreement', { required: constants.required })
 		dispatch(clearError())
 	}, [])
 	useEffect(() => {
@@ -98,6 +92,7 @@ const SignUpPage = () => {
 				placement: 'bottomRight',
 				duration: 7,
 			})
+		if (!error) api.destroy()
 	}, [error])
 	return (
 		<PageWrapper className={styles.page}>

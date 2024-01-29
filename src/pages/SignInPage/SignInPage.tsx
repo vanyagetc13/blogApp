@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { useSelector } from 'react-redux'
 import { Button } from 'antd'
+import { constants } from '../../utils'
 import { RootState } from '../../store'
 import { loginUser, clearError } from '../../store/authSlice'
 import PageWrapper from '../PageWrapper'
@@ -13,12 +14,6 @@ import styles from './SignInPage.module.scss'
 export interface ILoginForm {
 	email: string
 	password: string
-}
-
-const emailRegex = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/
-const required = {
-	value: true,
-	message: 'This field is required',
 }
 
 const SignInPage = () => {
@@ -36,14 +31,14 @@ const SignInPage = () => {
 	}
 	useEffect(() => {
 		register('email', {
-			required,
+			required: constants.required,
 			pattern: {
-				value: emailRegex,
+				value: constants.emailRegex,
 				message: 'You need to enter valid email',
 			},
 		})
 		register('password', {
-			required,
+			required: constants.required,
 			minLength: {
 				value: 6,
 				message: 'Password must be at least 6 symbols long',

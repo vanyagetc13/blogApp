@@ -13,7 +13,6 @@
 		"plugin:prettier/recommended",
 		"plugin:import/errors",
 		"plugin:import/warnings",
-		"eslint:recommended",
 		"plugin:@typescript-eslint/eslint-recommended",
 		"plugin:@typescript-eslint/recommended"
 	],
@@ -26,13 +25,7 @@
 	},
 	"plugins": ["react", "prettier", "import", "@typescript-eslint"],
 	"rules": {
-		"indent": [
-			"error",
-			"tab",
-			{
-				"SwitchCase": 1
-			}
-		],
+		"indent": "off", // Prettier works just fine :D
 		"no-unused-vars": "off", // @ts добавляет своё правило
 		"prettier/prettier": "error",
 		"linebreak-style": [0, "unix"],

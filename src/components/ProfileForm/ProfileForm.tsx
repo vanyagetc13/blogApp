@@ -1,19 +1,16 @@
 import React, { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 import { Button } from 'antd'
 import { useAppDispatch } from '../../hooks'
+import { constants } from '../../utils'
 import LabeledInput from '../LabeledInput/LabeledInput'
 import { IUser } from '../../types'
 import { updateUser } from '../../store/authSlice'
 import { RootState } from '../../store'
 import styles from './ProfileForm.module.scss'
 
-const required = {
-	value: true,
-	message: 'This field is required',
-}
-const emailRegex = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/
 const urlRegex =
 	// eslint-disable-next-line no-useless-escape
 	/^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/
@@ -36,6 +33,7 @@ type Props = {
 
 const ProfileForm = ({ user }: Props) => {
 	const dispatch = useAppDispatch()
+	const nav = useNavigate()
 	const loading = useSelector((state: RootState) => state.auth.loading)
 	const token = useSelector(
 		(state: RootState) => state.auth.currentUser?.token
@@ -53,7 +51,7 @@ const ProfileForm = ({ user }: Props) => {
 		})
 	useEffect(() => {
 		register('username', {
-			required,
+			required: constants.required,
 			minLength: {
 				value: 3,
 				message: 'Username must be at least 3 symbols long',
@@ -64,9 +62,9 @@ const ProfileForm = ({ user }: Props) => {
 			},
 		})
 		register('email', {
-			required,
+			required: constants.required,
 			pattern: {
-				value: emailRegex,
+				value: constants.emailRegex,
 				message: 'You need to enter valid email',
 			},
 		})
@@ -119,6 +117,10 @@ const ProfileForm = ({ user }: Props) => {
 		if (token && !isEmpty(newUser))
 			dispatch(updateUser({ user: newUser, token }))
 	}
+	useEffect(() => {
+		if (!loading && formState.isSubmitSuccessful && username)
+			nav(`/profiles/${username}`)
+	}, [loading, formState.isSubmitSuccessful])
 	return (
 		<form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
 			<h2 className={styles.title}>Edit Profile</h2>
